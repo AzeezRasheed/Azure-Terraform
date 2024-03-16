@@ -1,0 +1,9 @@
+# Compiled files
+*.tfstate
+*.tfstate.backup
+*.backup
+# logs
+*.log
+
+# Directories
+.terraform/

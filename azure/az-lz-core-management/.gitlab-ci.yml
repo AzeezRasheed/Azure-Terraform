@@ -1,0 +1,4 @@
+core-management:
+  trigger:
+    include:
+      - local: "ci-templates/core-management.yml"

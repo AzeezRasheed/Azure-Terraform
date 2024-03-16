@@ -1,0 +1,52 @@
+include:
+  - local: gitlab-ci-template.yml
+
+.job_template: &only_changes
+  variables:
+    SOURCE_DIR: ${CI_PROJECT_DIR}/lz-external-prod/shared
+    TAGS: "terraform"
+    TF_VERSION: "0.15.0"
+  image:
+    name: hashicorp/terraform:0.15.0
+    entrypoint: [""]
+  artifacts:
+    paths:
+      - $SOURCE_DIR/.terraform
+      - $SOURCE_DIR/.terraform.lock.hcl
+
+before_script:
+  - cd $SOURCE_DIR
+
+init-connectivity:
+  <<: *only_changes
+  stage: !reference [.init, stage]
+  script:  
+    - export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    - export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    - export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
+    - !reference [.init, script]
+  tags:  !reference [.init, tags]
+
+validate-connectivity:
+  <<: *only_changes
+  stage: !reference [.validate, stage]
+  script:  !reference [.validate, script]
+  tags:  !reference [.validate, tags]
+
+plan-connectivity:
+  <<: *only_changes
+  stage: !reference [.plan, stage]
+  script:  !reference [.plan, script]
+  tags:  !reference [.plan, tags]
+
+apply-connectivity:
+  <<: *only_changes
+  stage: !reference [.apply, stage]
+  script:  !reference [.apply, script]
+  tags:  !reference [.apply, tags]
+
+destroy-connectivity:
+  <<: *only_changes
+  stage: !reference [.destroy, stage]
+  script:  !reference [.destroy, script]
+  tags:  !reference [.destroy, tags]

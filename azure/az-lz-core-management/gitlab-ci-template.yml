@@ -1,0 +1,71 @@
+variables:
+  AWS_DEFAULT_REGION: "us-east-1"
+  TAGS: "terraform"
+
+cache:
+  paths:
+    - .terraform
+    
+before_script:
+  - terraform --version
+
+stages:
+  - init
+  - validate
+  - plan
+  - apply
+  - destroy
+
+.init: 
+  stage: init
+  script:
+    - echo $SOURCE_DIR
+    # - cp certifs.pem /usr/local/share/ca-certificates/certifs.pem
+    # - update-ca-certificates
+    - git config --global http.sslVerify false
+    - git config --global url."https://dqvinh:$iyusuf_PAT_TOKEN@10.201.224.22".insteadOf https://10.201.224.22
+    - git config --global url."https://dqvinh:$iyusuf_PAT_TOKEN@10.201.224.22".insteadOf https://gitlab.coxinc.com
+    - echo $iyusuf_PAT_TOKEN
+    # - cat certifs.pem
+    # - ls -la /usr/local/share/ca-certificates
+    - terraform init
+  tags:
+    - $TAGS
+
+.validate:
+  stage: validate
+  script:
+    - terraform validate
+  tags:
+    - $TAGS
+
+.plan:
+  stage: plan
+  script:
+    - terraform plan
+  dependencies:
+    - validate
+  artifacts:
+    paths:
+      - planfile
+  tags:
+    - $TAGS    
+
+.apply:
+  stage: apply
+  script:
+    - ls
+    - terraform apply --auto-approve
+  dependencies:
+    - plan
+  when: manual
+  tags:
+    - $TAGS
+
+.destroy:
+  stage: destroy
+  script:
+    - terraform destroy --auto-approve
+  when: manual
+  tags:
+    - $TAGS
